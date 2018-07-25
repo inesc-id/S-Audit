@@ -1,0 +1,21 @@
+% Encoding: UTF-8
+
+@InProceedings{Apolinario_Pardal_2018_TrustCom,
+  author    = {Filipe Apolinário and Miguel L. Pardal and Miguel Correia},
+  title     = {S-Audit: Efficient Data Integrity Verification for Cloud Storage},
+  booktitle = {The 17th IEEE International Conference On Trust, Security And Privacy In Computing And Communications (IEEE TrustCom-18)},
+  year      = {2018},
+  month     = jul,
+  abstract  = {Commercial cloud storage services are being widely adopted. 
+The most common integrity verification methods for data stored remotely are based on cryptographic hashes and digital signatures. 
+These allow checking that the data has not been tampered while stored in the cloud.
+However, both require downloading all the data before doing the verification, with significant time and monetary costs.
+
+This paper presents S-Audit, a service that provides integrity verification of data stored in commercial clouds.
+S-Audit uses homomorphic authentication with digital signatures to avoid retrieving the protected data from the cloud. 
+The service was integrated with a cloud-backed file system called SCFS to show how it can be used in practice. 
+Our experimental evaluation shows that using \textsc{S-Audit} is 7.1\% cheaper than using RSA signatures when the integrity of the data is verified monthly, and 34.9\% when verified weekly, in a typical setting.},
+  keywords  = {Security, Integrity, Digital Signatures, Homomorphic Authentication},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
