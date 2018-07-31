@@ -5,7 +5,7 @@
 # BlueJ files
 *.ctxt
 # Mobile Tools for Java (J2ME)
-.mtj.tmp/
+.mtj.tmp
 # Package Files #
 *.war
 *.nar
@@ -13,13 +13,13 @@
 *.zip
 *.tar.gz
 *.rar
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# virtual machine crash logs
 hs_err_pid*
-#SCFS DepSKY
+# SCFS DepSKY
 config
 eval
 ds-local*
-#S-Audit specific
+# S-Audit specific
 *.properties
 *.sig
 *.txt
@@ -27,7 +27,7 @@ ds-local*
 .classpath
 .project
 .settings
-bin/
-in/
-res/
-out/
+bin
+in
+res
+out
