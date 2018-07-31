@@ -23,18 +23,18 @@ In order to preserve the integrity of the data stored on the cloud, %using \text
 the entities involved 
 -- cloud, user and auditor -- 
 need to follow the *S-Audit interaction protocol* described herein.
-The protocol is divided into four tasks: setup (Section \ref{subsecSetup}), store data (Section \ref{subsecStoreData}), request and verify integrity proof (Section \ref{reqverproofs}), and generate integrity proof (Section \ref{genproofs}).
+The protocol is divided into four tasks: setup, store data, request and verify integrity proof, and generate integrity proof.
 
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 
-Auditors use the \textit{Pairing Generator} component to generate the setup parameters for pairing-based cryptography. 
-Users utilize the \textit{Key Generator} component to generate their asymmetric secret/public key pair and signature parameter ($w$); and use the \textit{Signature Generator} component to sign their data. 
-Both these entities use the \textit{Random Generator} component to generate random numbers belonging to any field of their choosing ($Z_p$, $G$ or $G_T$).
+Auditors use the Pairing Generator component to generate the setup parameters for pairing-based cryptography. 
+Users utilize the Key Generator component to generate their asymmetric secret/public key pair and signature parameter *w*; and use the *Signature Generator* component to sign their data. 
+Both these entities use the \textit{Random Generator} component to generate random numbers belonging to any field of their choosing (Z_p, G or G_T).
 
-Clouds run the \textit{Proof Generator} component to generate integrity proofs. 
-Auditors use the \textit{Proof Verifier} component to verify the proofs obtained from the cloud.
+Clouds run the Proof Generator component to generate integrity proofs. 
+Auditors use the Proof Verifier component to verify the proofs obtained from the cloud.
 
 ![S-Audit entities and components](doc/img/Entities-components-1.png)
 
@@ -45,34 +45,32 @@ Before storing any data in the cloud, the user and auditor must perform the foll
 
 1. The user and the auditor exchange data. 
 The auditor provides two files\footnotemark~to the user for setting-up pairing-based cryptography: 
-the \lq.param\rq\ file with all the secure public initialization parameters needed for configuring cyclic groups $G$, $G_T$ and the pairing for mapping $G \times G \rightarrow G_T$; and 
-the \lq.g\rq\ file with generator $g$ of the cyclic group $G$. 
+the .param file with all the secure public initialization parameters needed for configuring cyclic groups *G*, *G_T* and the pairing for mapping *G x G -> G_T*; and 
+the .g file with generator *g* of the cyclic group *G*. 
 The user provides configuration information to the auditor about 
 the time when each audit should be performed (e.g., daily, weekly), and other settings.
 
-2. The user generates his secret/public asymmetric key pair and the signature parameter ($w$) for signing and verifying data under the SW scheme, using respectively the %\textsc{S-Audit}'s 
-\emph{key} and \emph{random number generators} (explained in Section \ref{archsec}).
+2. The user generates his secret/public asymmetric key pair and the signature parameter (*w*) for signing and verifying data under the SW scheme, using respectively the S-Audit's key and random number generators.
 
-3. The user shares the public key and $w$ with auditor and stores $w$ on the cloud.
+3. The user shares the public key and *w* with auditor and stores w on the cloud.
 
-4. The user configures the cloud for listening to requests from the auditor requests and for responding to them, with the execution of %\textsc{S-Audit}'s  the \emph{proof generator service} (detailed in Section \ref{archsec}).
+4. The user configures the cloud for listening to requests from the auditor requests and for responding to them, with the execution of S-Audit's  the proof generator service.
 
 
 After these steps are performed users can now store their data in the cloud, as explained next.
 
 ####Random Number Generator
 
-This component allows generation of random numbers belonging to any of $Z_p$, $G$ or $G_T$ fields. 
-To do so, this generator receives as inputs the desired field, the pairing \lq.param\rq\ and the \lq.g\rq\ and outputs the random number.  
+This component allows generation of random numbers belonging to any of Z_p, G or G_T fields. 
+To do so, this generator receives as inputs the desired field, the pairing .param and the .g and outputs the random number.  
 
 #### Pairing Generator
 
-This component allows auditors to construct setup parameters (\lq.param\rq\ and \lq.g\rq) for initializing pairing-based cryptography, according to their security specification.
+This component allows auditors to construct setup parameters .param and .g for initializing pairing-based cryptography, according to their security specification.
 
-Auditors provide as input the type of pairing curve\footnotemark~to be used for pairing generation
-, and the parameters needed for initializing the curves.
+Auditors provide as input the type of pairing curve to be used for pairing generation, and the parameters needed for initializing the curves.
 
-The \emph{Pairing Generator} outputs: a specifier file (\lq.param\rq) detailing all the information about the multiplicative cyclic groups $G$ and $G_T$, the integer range of the $Z$ integers used for generating elements, and the pairing specifications for mapping $G$ to $G_T$; and the generator file \lq.g\rq\  containing the absolute value of the element used for generating the multiplicative group $G$.
+The Pairing Generator outputs: a specifier file .param detailing all the information about the multiplicative cyclic groups *G* and *G_T*, the integer range of the *Z* integers used for generating elements, and the pairing specifications for mapping *G* to *G_T*; and the generator file .g  containing the absolute value of the element used for generating the multiplicative group *G*.
 
 
 #### Key Generator
@@ -80,17 +78,17 @@ The \emph{Pairing Generator} outputs: a specifier file (\lq.param\rq) detailing 
 The Key Generator component allows users to generate their own asymmetric key pair and signature parameter according to the security information provided by the auditor. The generated keys are used for the BLS and SW schemes. 
 
 The generator works as follows: 
-the user inputs the setup parameters provided by the auditor \lq.param\rq\ and \lq.g\rq; 
+the user inputs the setup parameters provided by the auditor .param and .g; 
 the component initializes the pairing; 
-generates the secret key by selecting a random number belonging to $Z_p$; 
-generates the public key by computing $g^{sk}$; 
-generates the signature parameter by selecting a random number belonging to $G$;  
-and returns the keys and $w$ to the user. 
+generates the secret key by selecting a random number belonging to *Z_p*; 
+generates the public key by computing *g^{sk}*; 
+generates the signature parameter by selecting a random number belonging to *G*;  
+and returns the keys and *w* to the user. 
 ### Sign
 
-When the user stores data in the cloud, all data must be divided into blocks belonging to $Z_p$ and signed. 
-The %\textsc{S-Audit}'s *signature generator* (further explained in Section \ref{archsec}) automates these tasks and produces a signature equivalent to the SW Block Signature step (described in Section \ref{mathhomoproof}). 
-To do so, the client provides as \emph{input} for the signature generator: the data and its identifier (e.g., the file content of the \lq data.txt\rq\ file is used as the data and the identifier is the file name), alongside with the pairing cryptography parameters ('.param' and \lq.g\rq\ files), secret key (\lq.sk\rq), and the signature parameter (\lq.w\rq); and obtains the signature of all the data blocks. 
+When the user stores data in the cloud, all data must be divided into blocks belonging to *Z_p* and signed. 
+The %\textsc{S-Audit}'s *signature generator* (further explained in Section \ref{archsec}) automates these tasks and produces a signature equivalent to the SW Block Signature step. 
+To do so, the client provides as input for the signature generator: the data and its identifier (e.g., the file content of the  data.txt file is used as the data and the identifier is the file name), alongside with the pairing cryptography parameters ('.param' and .g files), secret key (.sk), and the signature parameter (.w); and obtains the signature of all the data blocks. 
 
 After the signature of the data is obtained, the user stores both the data and signature in the cloud. Data can now be verified.
 
@@ -98,9 +96,9 @@ After the signature of the data is obtained, the user stores both the data and s
 
 The Signature Generator component allows clients to sign data using %the signing step of the SW scheme. 
 
-In the SW scheme, the data to be signed is assumed to have fixed sizes and belongs to $Z_p$. 
-To support data sizes bigger than original data, users have to divide the data in blocks that belong to $Z_p$, and sign each block individually. 
-In order to automate data division into $Z_p$ data blocks and sign each of them with the SW scheme, the \emph{Signature Generator} supports two signing modes: the Sign-Block mode, for signing individual data blocks in $Z_p$; and the Sign-Data mode, that converts all the input data to one or more blocks $\in$ $Z_p$, signs each block using the Sign Block component, and returns the concatenation of all generated signatures from the blocks.
+In the SW scheme, the data to be signed is assumed to have fixed sizes and belongs to *Z_p*. 
+To support data sizes bigger than original data, users have to divide the data in blocks that belong to *Z_p*, and sign each block individually. 
+In order to automate data division into *Z_p* data blocks and sign each of them with the SW scheme, the **Signature Generator** supports two signing modes: the Sign-Block mode, for signing individual data blocks in *Z_p*; and the Sign-Data mode, that converts all the input data to one or more blocks *\in* *Z_p*, signs each block using the Sign Block component, and returns the concatenation of all generated signatures from the blocks.
 ### Verify
 
 Divided into two parts: Auditor and cloud.
@@ -109,80 +107,46 @@ Divided into two parts: Auditor and cloud.
 The auditor is responsible for integrity verification. 
 To do so, whenever the auditor wants to obtain integrity proofs of a file stored on the cloud, it must perform the following steps:
 
-1. Select a file composed of $x$ data elements (vector $[0,...,x-1]$). %, so that the cost of obtaining the proof for the $x$ elements is, at most, the price the user wants to pay for the audit.
+1. Select a file composed of *x* data elements (vector *[0,...,x-1]*).
 
-2. Generate a random challenge (number belonging to $Z_p$) for each of the $x$ data elements chosen, using the %\textsc{S-Audit}'s 
-\emph{random number generator}.
+2. Generate a random challenge (number belonging to *Z_p*) for each of the *x* data elements chosen, using the random number generator.
 
-3. Issue the integrity proof request to the cloud specifying the identifiers vector ($[id_0,...,id_x]$) and the corresponding challenge vector ($[chal_0,...,chal_x]$). 
+3. Issue the integrity proof request to the cloud specifying the identifiers vector (*[id_0,...,id_x]*) and the corresponding challenge vector (*[chal_0,...,chal_x]*). 
 
-4. Upon receiving a response from the cloud with the requested integrity proof, the auditor verifies it using the %\textsc{S-Audit}'s 
-\emph{proof verifier} (further explained in Section \ref{archsec}). 
-The auditor provides the public key $pk$ and the signature parameter $w$, alongside with the identifiers and challenges used on the integrity request, and 
-obtains the integrity verification result. 
-%Using \textsc{S-Audit}'s proof verifier for performing the verification test 
-This step corresponds to the Proof Verification step of the SW scheme (described in Section \ref{mathhomoproof}).  
-\end{itemize}
+4. Upon receiving a response from the cloud with the requested integrity proof, the auditor verifies it using the S-Audit's 
+**proof verifier**. 
+The auditor provides the public key *pk* and the signature parameter *w*, alongside with the identifiers and challenges used on the integrity request, and obtains the integrity verification result. 
+This step corresponds to the Proof Verification step of the SW scheme.  
 
 ##### Proof Verifier
 
-The \emph{Proof Verifier} component allows users to verify integrity proofs, using the SW proof verification step. 
-To do so, %as described in Listing \ref{proofVerAlg} 
-the algorithm first initializes pairing with the setup parameters (\lq.param\rq\  and \lq.g\rq)% (lines 1-4)
-%MP changes to greek letter
-; applies g pairing to $\beta$ % (line 7)
-, multiplies all identifiers present in the proof with $w^{\alpha}$% (lines 10-17)
-, applies public key pairing to the identifier and $\alpha$ multiplication % (line 20)
- and verifies if both pairings obtained a match. 
- If so, the data integrity is preserved.
+The **Proof Verifier** component allows users to verify integrity proofs, using the SW proof verification step. 
+To do so, the algorithm first initializes pairing with the setup parameters (.param  and .g); applies g pairing to *\beta*, multiplies all identifiers present in the proof with *w^{\alpha}*, applies public key pairing to the identifier and *\alpha* multiplication and verifies if both pairings obtained a match. If so, the data integrity is preserved.
 
 #### Cloud: Generate Integrity Proof
-\label{genproofs}
-
-Whenever the cloud receives an integrity proof request for a given file,
-%(as described in Section \ref{reqverproofs})
-%the cloud 
-it performs the following steps: 
+Whenever the cloud receives an integrity proof request for a given file, it performs the following steps: 
 
 1. Fetch all the data and signatures of the file from the storage cloud corresponding to the identifiers specified. 
 
-2. Fetch from the storage cloud, the pairing cryptography parameters (\lq .param\rq\ and \lq.g\rq), and the signature parameter (\lq.w\rq), of the user requested. 
+2. Fetch from the storage cloud, the pairing cryptography parameters ( .param\ and .g), and the signature parameter (.w), of the user requested. 
 
-3. Generate integrity proof, composed of: %the 
-aggregation of signatures provided ($\beta$); and 
-%the 
-aggregation of data provided ($\alpha$), by using %\textsc{S-Audit}'s 
-the \emph{proof generator} (explained in \ref{proofgen}). 
-The generator receives data, setup parameters (\lq.g\rq\ and \lq.param\rq), signatures, challenges, pairing cryptography parameters and the random initialization parameter related to the file; and 
-produces the $\alpha$ and $\beta$. 
-This step corresponds to the proof generation step of the SW scheme. 
+3. Generate integrity proof, composed of:  
+aggregation of signatures provided (*beta*); and aggregation of data provided (*alpha*), by using S-Audit's the **proof generator**. 
+The generator receives data, setup parameters (.g\ and .param), signatures, challenges, pairing cryptography parameters and the random initialization parameter related to the file; and produces the *alpha* and *beta*. This step corresponds to the proof generation step of the SW scheme. 
 
-4. Respond to %the 
-requester with the integrity proof ($\alpha$ and $\beta$). 
+4. Respond to requester with the integrity proof (*alpha* and *beta*). 
 
 #####Proof Generator
 \label{proofgen}
 
-The \emph{Proof Generator} component is the only one that 
-%runs 
-is executed in the cloud (cf.~Figure \ref{Entities-components}). 
+The **Proof Generator** component is the only one that is executed in the cloud. 
 It allows clouds to generate integrity proofs with the files they have stored whenever an auditor requests them. 
-To do so, %as described in Listing \ref{proofGenAlg} 
-the algorithm first initializes pairing with the setup parameters%(lines 2-4)
-, then calculates $\alpha$ %(lines 7 to 11)
- and $\beta$ based on the data's blocks present in the file.
-% (lines 13 to 18)
-%MP changed alpha and beta to greek letters
-%
-To simplify the deployment and to reduce the cost of 
-%To reduce the cost of 
-running the \emph{Proof Generator} in a cloud, we leverage recent services that implement the FaaS %, serverless computing, or lambda 
-model \cite{fox2017status,hendrickson2016serverless}. 
+To do so, the algorithm first initializes pairing with the setup parameters, then calculates *\alpha* and *\beta* based on the data's blocks present in the file.
+To simplify the deployment and to reduce the cost of running the **Proof Generator} in a cloud, we leverage recent services that implement the FaaS %, serverless computing, or lambda model. 
 The alternative would be to have a virtual machine for this purpose in a cloud compute service (e.g., Amazon EC2), but it would be costly to run it permanently in the cloud, or to store an image there to run it when necessary. 
-%
 The FaaS model allows the execution of a code component (a function) in a cloud upon a certain event, in our case, the reception of a request through a REST API. % in our case. 
-In this model, the users pay only for the time and resources used when the function is executed, not when it is idle. Therefore, it is possible to have %\textsc{S-Audit}'s 
-the \emph{Proof Generator} component always ready to run in the cloud without costs when it is not running. 
+In this model, the users pay only for the time and resources used when the function is executed, not when it is idle. Therefore, it is possible to have S-Audit's 
+the **Proof Generator** component always ready to run in the cloud without costs when it is not running. 
 
 ##Extending SCFS with S-Audit
 
@@ -206,11 +170,11 @@ In the integration we have to consider the three \textsc{S-Audit} entities:
 
 \begin{itemize}
 
-\item The \emph{user} code is integrated with the client-side code of SCFS;
+\item The **user} code is integrated with the client-side code of SCFS;
 
-\item The \emph{auditor} code is a stand-alone Java program;
+\item The **auditor} code is a stand-alone Java program;
 
-\item The \emph{cloud} code runs in a FaaS service such as Amazon Lambda \cite{AmazonLambda}.
+\item The **cloud} code runs in a FaaS service such as Amazon Lambda \cite{AmazonLambda}.
 
 \end{itemize}
 
@@ -238,7 +202,6 @@ As seen in Figure \ref{scfsStructure}, for integrating these new drivers, DepSky
 %Regarding the 
 Code was added to the core package of DepSky, in the DepSky initialization function (in \textit{LocalDepSkySClient.java}) and to the DepSky driver constructor function (in \textit{DriversFactory.java}).
 
-%Now, with the code added, besides its previous behavior, whenever the user chooses to use an auditable cloud driver \footnote{Cloud driver selection is performed based on the DepSky's configuration file. The difference between choosing an auditable or non-auditable cloud is their name (e.g., \textit{AMAZON-S3} is non-auditable and \textit{AUDITABLE-AMAZON-S3} is auditable).
 For using \textsc{S-Audit}, SCFS has to be configured with these \textit{auditable cloud drivers}, which implement the logic of our system. 
 For instance, to use Amazon S3 as cloud storage, instead of using the original (non-auditable) driver \textit{amazon-s3}, the corresponding auditable driver \textit{auditable-amazon-s3} was % shall be 
 used.
