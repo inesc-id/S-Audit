@@ -59,7 +59,7 @@ the time when each audit should be performed (e.g., daily, weekly), and other se
 
 After these steps are performed users can now store their data in the cloud, as explained next.
 
-####Random Number Generator
+#### Random Number Generator
 
 This component allows generation of random numbers belonging to any of Z_p, G or G_T fields. 
 To do so, this generator receives as inputs the desired field, the pairing .param and the .g and outputs the random number.  
@@ -136,8 +136,7 @@ The generator receives data, setup parameters (.g\ and .param), signatures, chal
 
 4. Respond to requester with the integrity proof (*alpha* and *beta*). 
 
-#####Proof Generator
-\label{proofgen}
+##### Proof Generator
 
 The **Proof Generator** component is the only one that is executed in the cloud. 
 It allows clouds to generate integrity proofs with the files they have stored whenever an auditor requests them. 
@@ -148,61 +147,39 @@ The FaaS model allows the execution of a code component (a function) in a cloud 
 In this model, the users pay only for the time and resources used when the function is executed, not when it is idle. Therefore, it is possible to have S-Audit's 
 the **Proof Generator** component always ready to run in the cloud without costs when it is not running. 
 
-##Extending SCFS with S-Audit
+## Extending SCFS with S-Audit
 
-\textsc{S-Audit} was %developed 
-designed to allow easy integration with existing cloud-backed applications.
-As a proof of concept, the \textsc{S-Audit} components described in Section \ref{archsec} were integrated with the \textit{Shared Cloud-backed File System} (SCFS) \cite{Bessani2014}.
+S-Audit was designed to allow easy integration with existing cloud-backed applications.
+As a proof of concept, the S-Audit components described in Section \ref{archsec} were integrated with the Shared Cloud-backed File System (SCFS).
 
-SCFS is a distributed %, POSIX-compliant, 
-file system that %guarantees data confidentiality, integrity, and availability. 
-%It allows users to 
-stores files in a cloud or a set of clouds (a \textit{cloud of clouds}). %with the usual consistency of a file system which requires 
-%atomic consistency or 
-%linearizability \cite{herlihy1990linearizability}), even if weak consistency storage cloud services are used, for example, services that guarantee only eventual consistency \cite{vogels2009eventually}.
-%
-%SCFS 
-%In this system, 
-Users \textit{mount} the SCFS file system on a folder of their device, and the SCFS client-side component synchronizes files with the cloud storage services. 
+SCFS is a distributed file system that stores files in a cloud or a set of clouds (a cloud of clouds). 
+
+Users mount the SCFS file system on a folder of their device, and the SCFS client-side component synchronizes files with the cloud storage services. 
 SCFS supports data sharing among several users, automatically propagating users' modifications between them.
-%
-In the integration we have to consider the three \textsc{S-Audit} entities:
 
-\begin{itemize}
-
-\item The **user} code is integrated with the client-side code of SCFS;
-
-\item The **auditor} code is a stand-alone Java program;
-
-\item The **cloud} code runs in a FaaS service such as Amazon Lambda \cite{AmazonLambda}.
-
-\end{itemize}
+In the integration we have to consider the three S-Audit entities:
+* The user code is integrated with the client-side code of SCFS;
+* The auditor code is a stand-alone Java program;
+* The cloud code runs in a FaaS service such as Amazon Lambda.
 
 Next we focus mostly on the first entity, as it is the one truly integrated with SCFS code.
 
-%Regarding  storage of data in the cloud, 
 SCFS has two modes: the single-cloud model, where files are stored in a service like Amazon S3; and 
-the multiple-cloud model, where files are stored on several clouds using the DepSky software library \cite{DepSky-EuroSys}. 
-%DepSky provides an API for uploading and operating with a set of clouds, while enforcing fault tolerance, lock-in resilience, confidentiality, and integrity of the overall set of the clouds' storages, as long as the clouds affected with the aforementioned problems do not reach the majority of the cloud set. 
-In this integration, SCFS was configured with DepSky. %and the integration with \textsc{S-Audit} was made through DepSky.
-%
-Data integrity is protected in SCFS and DepSky using RSA digital signatures \cite{rivest1978method}.
+the multiple-cloud model, where files are stored on several clouds using the DepSky software library. 
+In this integration, SCFS was configured with DepSky. %and the integration with S-Audit was made through DepSky.
+Data integrity is protected in SCFS and DepSky using RSA digital signatures.
 This allows users to verify any data present in the cloud storage, but requires users to download the data and the signatures and perform the integrity verification on their device, with both monetary costs and delays.
 
-The user components of \textsc{S-Audit} were integrated in DepSky's component responsible for uploading data into the cloud. 
-%This component receives the data from SCFS, applies mechanisms that ensure confidentiality, integrity, and availability,  then stores the resulting data in the cloud. 
-The logic for communicating with different commercial clouds is implemented in subcomponents called \textit{cloud drivers}. 
-Since the integration of \textsc{S-Audit} should not break any of the features currently supported by DepSky or SCFS, integrating both systems required code changes to DepSky, 
-in a contained way. %and 
-The followed approach was 
-the addition of a new type of cloud driver: the \textit{auditable cloud driver}. 
-%
-With these newly introduced cloud drivers, besides accessing and uploading data to the cloud, data is signed using \textsc{S-Audit}'s signature generator and the signature is also stored on the cloud. 
-As seen in Figure \ref{scfsStructure}, for integrating these new drivers, DepSky was modified in  two packages: core and drivers. 
-%Regarding the 
-Code was added to the core package of DepSky, in the DepSky initialization function (in \textit{LocalDepSkySClient.java}) and to the DepSky driver constructor function (in \textit{DriversFactory.java}).
+The user components of S-Audit were integrated in DepSky's component responsible for uploading data into the cloud. 
+The logic for communicating with different commercial clouds is implemented in subcomponents called cloud drivers. 
+Since the integration of S-Audit should not break any of the features currently supported by DepSky or SCFS, integrating both systems required code changes to DepSky, in a contained way. 
+The followed approach was the addition of a new type of cloud driver: the _auditable cloud driver_. 
 
-For using \textsc{S-Audit}, SCFS has to be configured with these \textit{auditable cloud drivers}, which implement the logic of our system. 
+With these newly introduced cloud drivers, besides accessing and uploading data to the cloud, data is signed using S-Audit's signature generator and the signature is also stored on the cloud. 
+As seen in the Figure, for integrating these new drivers, DepSky was modified in  two packages: core and drivers. 
+Code was added to the core package of DepSky, in the DepSky initialization function (in _LocalDepSkySClient.java_) and to the DepSky driver constructor function (in _DriversFactory.java_).
+
+For using S-Audit, SCFS has to be configured with these \textit{auditable cloud drivers}, which implement the logic of our system. 
 For instance, to use Amazon S3 as cloud storage, instead of using the original (non-auditable) driver \textit{amazon-s3}, the corresponding auditable driver \textit{auditable-amazon-s3} was % shall be 
 used.
 Users can choose which drivers to use, by modifying the configuration file with the name of the desired drivers. 
@@ -217,12 +194,12 @@ code.
 
 ## Built With
 
-* [Java](https://www.oracle.com/java/) - The web framework used
-* [JPBC](http://gas.dia.unisa.it/projects/jpbc/) - Dependency Management
-* [AWSLambda](https://aws.amazon.com/lambda/) - Used to generate RSS Feeds
-* [SCFS](https://github.com/cloud-of-clouds/SCFS)
-* [Depsky](https://github.com/cloud-of-clouds/depsky)
-* [DepSpace](https://github.com/bft-smart/depspace)
+* [Java](https://www.oracle.com/java/) - Java programming language platform
+* [JPBC](http://gas.dia.unisa.it/projects/jpbc/) - Java Pairing Based Cryptography Library 
+* [AWSLambda](https://aws.amazon.com/lambda/) - Function execution on the cloud without server configuration and management
+* [SCFS](https://github.com/cloud-of-clouds/SCFS) - cloud-backed file system
+* [Depsky](https://github.com/cloud-of-clouds/depsky) - cloud-of-clouds library
+* [DepSpace](https://github.com/bft-smart/depspace) - tuple space
 
 
 ## Authors
